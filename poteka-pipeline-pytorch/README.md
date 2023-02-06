@@ -3,6 +3,8 @@
 This project is a ML pipeline for managing all steps (preprocessing P-POTEKA
 data, training and evaluate pytorch models) of experiments.
 
+See [API documents](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/)
+
 ## Flow of pipeline
 
 1. **Preprocessing:** Split all P-POTEKA datasets into train, validation and
@@ -34,11 +36,6 @@ All models are difined in `train/src/models`.
 - `Adam` optimizer is used.
 - `BCE loss` is used because the output is scaled to [0, 1].
 - `RMSE` and `R2Score` is used for evaluation.
-- Using
-  [cleaned](https://github.com/tsugumi-sys/poteka_data_analysis/tree/main/dataset/data-cleaning)
-  and
-  [interpolated](https://github.com/tsugumi-sys/poteka_data_analysis/tree/main/dataset/data-making)
-  P-POTEKA dataset.
 - `unittest` is used for unittests.
 
 ## Getting Started
@@ -46,11 +43,8 @@ All models are difined in `train/src/models`.
 ### Setup
 
 - Modify `project_root_dir_path` in `conf/config.yaml`
-- Place
-  [`train_dataset.csv`](https://github.com/tsugumi-sys/poteka_data_analysis/blob/main/EDA/rain/select_train_dataset.ipynb)
-  and
-  [`test_dataset.json`](https://github.com/tsugumi-sys/poteka_data_analysis/blob/main/EDA/rain/select_validation_dataset.ipynb)
-  in `preprocess/src`.
+- Place `train_dataset.csv` and `test_dataset.json` in `preprocess/src`. You can
+  create and save them via the command in `../poteka-data/Makefile`.
 - Set `CONDA_ENV_NAME` and `EXPERIMENT_NAME` (mlflow experiment name) and
   `MODEL_NAME` (the target model).
 - Modify parameters in `conf/`.
