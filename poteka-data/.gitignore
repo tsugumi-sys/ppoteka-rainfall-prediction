@@ -1,0 +1,9 @@
+*.csv
+*.json
+__pycache__
+.ipynb_checkpoints
+*.png
+
+.env
+
+dataset/data-making/log/*
