@@ -37,9 +37,10 @@ data/rain_image/, data/temp_image/).
 
 ### Selecting training and test datasets.
 
-1, Selecting test datasets. The test case meta file `test_dataset.json` are
-created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. Modify
-`processing/select_test_dataset.py`. Selecting training datasets 2. Selecting
-training dataaset. The training meta file `train_dataset.csv` are created and
-saved in `../poteka-pipeline-pytorch/preprocess/src/`. The data selected in test
-case is dropped so `test_dataset.json` is needed for this process.
+1. Selecting test datasets. The test case meta file `test_dataset.json` are
+   created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. Modify
+   `processing/select_test_dataset.py` for customing test cases.
+2. Selecting training datasets. The training meta file `train_dataset.csv` are
+   created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. The data
+   selected in test case is dropped so `test_dataset.json` is needed for this
+   process.
