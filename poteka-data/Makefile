@@ -75,5 +75,18 @@ preprocess_abs_wind_data:
 preprocess_rain_data: 
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_rain_image.py \
 		--data_root_path=$(DATA_DIR) \
-		--n_jobs=$(N_CPUS) \
+		--n_jobs=$(N_CPUS)
 
+
+###
+# Select train dataset and test dataset,
+###
+select_train_dataset:
+	python processing/data-making/select_train_dataset.py \
+		--data_root_dir=$(DATA_DIR) \
+		--max_rainfall_threshold=5
+
+select_test_dataset:
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/select_test_dataset.py \
+		--data_root_dir=$(DATA_DIR) \
+		--timestep_delta=$(TIME_STEP)

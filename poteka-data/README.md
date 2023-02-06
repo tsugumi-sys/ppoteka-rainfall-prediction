@@ -2,8 +2,8 @@
 
 ## Overview
 
-You can run data cleaning process and interpolation process with commands in
-`Makefile`.
+Data cleaning process, interpolation process and selecting training & test
+dataaset with commands in `Makefile`.
 
 ### Cleaning
 
@@ -34,3 +34,12 @@ is created.
 Creating grid data from the observation points data. The interpolated grid data
 and visualized map are saved in each weather parameter directories (e.g.
 data/rain_image/, data/temp_image/).
+
+### Selecting training and test datasets.
+
+1, Selecting test datasets. The test case meta file `test_dataset.json` are
+created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. Modify
+`processing/select_test_dataset.py`. Selecting training datasets 2. Selecting
+training dataaset. The training meta file `train_dataset.csv` are created and
+saved in `../poteka-pipeline-pytorch/preprocess/src/`. The data selected in test
+case is dropped so `test_dataset.json` is needed for this process.
