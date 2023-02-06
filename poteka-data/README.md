@@ -44,3 +44,7 @@ data/rain_image/, data/temp_image/).
    created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. The data
    selected in test case is dropped so `test_dataset.json` is needed for this
    process.
+
+#### `EDA/`
+
+Exporatory data analysis for each weather parameters in jupyter notebooks.
