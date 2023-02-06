@@ -1,0 +1,10 @@
+name: mlflow_pipeline
+
+entry_points:
+    train:
+        parameters:
+            hydra_file_path:
+                type: str
+        command: |
+            python -m src.train \
+                --hydra_file_path={hydra_file_path}
