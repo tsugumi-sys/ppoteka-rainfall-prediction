@@ -11,12 +11,12 @@ cleaning has 3 processes.
 
 1. **Raw data scaling and format datetime**: Read the data from the raw ppoteka
    data files and rescale each parameter values. And format datetime string.
-   Finally, the cleaned data is saved into `data/cleaned-data`
+   Finally, the cleaned data is saved into `data/cleaned-data/` directory.
 2. **Imputation**: Data imputation is applied for missing values for the data in
    `$(DATA_DIR)/cleaned-data`. Finally inmputed data is saved into
-   `data/imputed_data`
+   `data/imputed_data/` directory.
 3. **Accumulation of rainfall data**: Hourly rainfall amount is calculated.
-   Finally the data is saved into `data/accumulated-raf-data`.
+   Finally the data is saved into `data/accumulated-raf-data/` directory.
 
 ### Interpolation
 

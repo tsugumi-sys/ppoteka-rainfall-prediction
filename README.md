@@ -8,8 +8,9 @@ This repository contains two parts for rainfall prediction using PPOTEKA data.
 ## Getting started
 
 1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`
-2. Exacute data cleaning and interpolation in `poteka-data`.
-3. Training and evaluation machine learning models in `poteka-pipeline-pytorch`.
+2. Exacute data cleaning and interpolation in `poteka-data/`.
+3. Training and evaluation machine learning models in
+   `poteka-pipeline-pytorch/`.
 
 #### NOTE
 
