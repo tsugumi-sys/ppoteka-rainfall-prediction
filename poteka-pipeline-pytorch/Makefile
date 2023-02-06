@@ -57,7 +57,7 @@ test:
 ###
 # Build docs
 ###
-PDOC_LOCATION=docs/pdoc_contents
+PDOC_LOCATION=../docs/pdoc_contents
 .PHONY: build_docs
 build_docs:
 	pdoc -o $(PDOC_LOCATION) -d google preprocess/ && \
@@ -86,14 +86,3 @@ poetry_ui:
 .PHONY: poetry_test
 poetry_test:
 	poetry run python -m unittest -v $(TARGET_MODULE)
-
-###
-# Build docs
-###
-PDOC_LOCATION=docs/pdoc_contents
-.PHONY: build_docs
-build_docs:
-	pdoc -o $(PDOC_LOCATION) -d google preprocess/ && \
-	pdoc -o $(PDOC_LOCATION) -d google train/ && \
-	pdoc -o $(PDOC_LOCATION) -d google evaluate/ && \
-	pdoc -o $(PDOC_LOCATION) -d google common/
