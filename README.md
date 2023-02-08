@@ -8,7 +8,7 @@ This repository contains two parts for rainfall prediction using PPOTEKA data.
 ## Getting started
 
 1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`.
-  The directory tree is like follows.
+  The directory tree is as follows.
   ```
   .
 ├── data/ (<- You Need to Create This Folder.)

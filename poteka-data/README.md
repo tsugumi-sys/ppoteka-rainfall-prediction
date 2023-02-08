@@ -18,6 +18,18 @@ cleaning has 3 processes.
 3. **Accumulation of rainfall data**: Hourly rainfall amount is calculated.
    Finally the data is saved into `data/accumulated-raf-data/` directory.
 
+After cleaning step, the `data/` folder is as follows.
+
+  ```
+  .
+├── data/
+│   └── poteka-raw-data/
+│   └── accumulated-raf-data/ (<- Created at cleaning step 3.)
+│   └── cleaned-data/ (<- Created at cleaning step 1.)
+│   └── imputed-data/ (<- Created at cleaning step 2.)
+├── ...
+  ```
+
 ### Interpolation
 
 #### First step
@@ -25,7 +37,7 @@ cleaning has 3 processes.
 Before interpolation, combining all observation points data of the same datetime
 is created.
 
-- **Creaing `one-day-data`**: Reading from all the observation point data at the
+- **Creating `one-day-data`**: Reading from all the observation point data at the
   same datetime in `data/accumulated-raf-data`, then combine them into a single
   csv files.
 
@@ -33,7 +45,23 @@ is created.
 
 Creating grid data from the observation points data. The interpolated grid data
 and visualized map are saved in each weather parameter directories (e.g.
-data/rain_image/, data/temp_image/).
+`data/rain_image/`, `data/temp_image/`).
+
+After interpolation step, the `data/` folder is as follows.
+
+  ```
+  .
+├── data/
+│   └── poteka-raw-data/
+│   └── accumulated-raf-data/ 
+│   └── cleaned-data/ 
+│   └── imputed-data/
+│   └── one-day-data/ (<- Greated at the first step of the interpolation process.)
+│   └── rain_image/ (<- Created at the interpolation step.)
+│   └── temp_image/ (<- Created at the interpolation step.)
+│   └── ... (Other weather parameters' interpolated data directories)
+├── ...
+  ```
 
 ### Selecting training and test datasets.
 
@@ -44,6 +72,19 @@ data/rain_image/, data/temp_image/).
    created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. The data
    selected in test case is dropped so `test_dataset.json` is needed for this
    process.
+   
+After this process, new files are placed as follows.
+
+  ```
+  .
+├── data/
+├── poteka-pipeline-pytorch/
+│   └── preprocess/
+│       ├── src/
+│       │   └── test_dataset.json (<- Placed here.)
+│       │   └── train_dataset.csv (<- Placed here.)
+├── ...
+  ```
 
 #### `EDA/`
 
