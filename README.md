@@ -7,12 +7,12 @@ This repository contains two parts for rainfall prediction using PPOTEKA data.
 
 ## Getting started
 
-1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`
+1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`.
   The directory tree is like follows.
   ```
   .
-├── data/
-│   └── poteka-raw-data/
+├── data/ (<- You Need to Create This Folder.)
+│   └── poteka-raw-data/ (<- You need to Create This Folder and place raw P-POTEKA data.)
 │       ├── Anabu-1B_00181286/
 │       │   └── ...
 │       ├── ASTI_00173457/
