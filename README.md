@@ -3,11 +3,26 @@
 This repository contains two parts for rainfall prediction using PPOTEKA data.
 
 1. Data processing of the raw P-POTEKA data.
-2. Training machine larning models for rainfall prediction.
+2. Training and evaluation of machine larning models for rainfall prediction.
 
 ## Getting started
 
 1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`
+  The directory tree is like follows.
+  ```
+  .
+├── data/
+│   └── poteka-raw-data/
+│       ├── Anabu-1B_00181286/
+│       │   └── ...
+│       ├── ASTI_00173457/
+│       │   └── ...
+│       └── ...
+├── docs/
+├── poteka-data/
+├── poteka-pipeline-pytorch/
+└── README.md
+  ```
 2. Exacute data cleaning and interpolation in `poteka-data/`.
 3. Training and evaluation machine learning models in
    `poteka-pipeline-pytorch/`.
