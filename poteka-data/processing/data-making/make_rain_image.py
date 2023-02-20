@@ -68,9 +68,7 @@ def make_img(
         df = pd.read_csv(data_file_path, index_col=0)
         df["hour-rain--original"] = df["hour-rain"]
         df["hour-rain"] = np.where(
-            df["hour-rain"] > 0,
-            df["hour-rain"],
-            round(random.uniform(0.1, 0.8), 5),
+            df["hour-rain"] > 0, df["hour-rain"], round(random.uniform(0.1, 0.8), 5),
         )
 
         # rbfi = RBFInterpolator(
@@ -94,10 +92,7 @@ def make_img(
         grid_lon = np.round(np.linspace(120.90, 121.150, 50), decimals=3)
         grid_lat = np.round(np.linspace(14.350, 14.760, 50), decimals=3)
         # xi, yi = np.meshgrid(grid_lon, grid_lat)
-        xgrid = np.around(
-            np.mgrid[120.90:121.150:50j, 14.350:14.760:50j],
-            decimals=3,
-        )
+        xgrid = np.around(np.mgrid[120.90:121.150:50j, 14.350:14.760:50j], decimals=3,)
         xfloat = xgrid.reshape(2, -1).T
 
         # z1 = rbfi(xfloat)
@@ -118,11 +113,7 @@ def make_img(
         clevs = [0, 5, 7.5, 10, 15, 20, 30, 40, 50, 70, 100]
         cmap_data = [
             (1.0, 1.0, 1.0),
-            (
-                0.3137255012989044,
-                0.8156862854957581,
-                0.8156862854957581,
-            ),
+            (0.3137255012989044, 0.8156862854957581, 0.8156862854957581,),
             (0.0, 1.0, 1.0),
             (0.0, 0.8784313797950745, 0.501960813999176),
             (0.0, 0.7529411911964417, 0.0),
@@ -141,10 +132,7 @@ def make_img(
         cbar = plt.colorbar(cs, orientation="vertical")
         cbar.set_label("mm/h")
         ax.scatter(
-            df["LON"],
-            df["LAT"],
-            marker="D",
-            color="dimgrey",
+            df["LON"], df["LAT"], marker="D", color="dimgrey",
         )
         for i, val in enumerate(df["hour-rain--original"]):
             ax.annotate(val, (df["LON"][i], df["LAT"][i]))
@@ -198,10 +186,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--n_jobs",
-        type=int,
-        default=1,
-        help="The number of cpu cores to use",
+        "--n_jobs", type=int, default=1, help="The number of cpu cores to use",
     )
 
     args = parser.parse_args()

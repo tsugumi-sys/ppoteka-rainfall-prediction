@@ -39,7 +39,7 @@ def impute_data(csv_file_path: str, save_dir_path: str) -> None:
     # )
 
     # save
-    os.makedirs(save_dir_path, exists_ok=True)
+    os.makedirs(save_dir_path, exist_ok=True)
     imp_df.to_csv(os.path.join(save_dir_path, "data.csv"))
 
 
@@ -87,6 +87,7 @@ def main(data_dir_path: str, n_jobs: int):
                     )
                     arg["csv_file_path"] = data_file
                     arg["save_dir_path"] = save_dir_path
+                    args_impute_data.append(arg)
 
         Parallel(n_jobs=n_jobs)(
             delayed(impute_data)(

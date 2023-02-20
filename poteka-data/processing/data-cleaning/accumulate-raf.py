@@ -5,9 +5,11 @@ from datetime import date, timedelta
 from typing import Optional
 
 import pandas as pd
+from joblib import Parallel, delayed
+from tqdm import tqdm
 
 
-def calc_horly_rain(
+def calc_hourly_rain(
     csv_file_path: str,
     save_dir_path: str,
     yesterday_csv_file_path: Optional[str] = None,
@@ -20,7 +22,7 @@ def calc_horly_rain(
     df["hour-rain"] = df["RAF"].rolling(60, min_periods=1).sum()
     df_today["hour-rain"] = df["hour-rain"].loc[df_today.index]
 
-    os.makedirs(save_dir_path, exists_ok=True)
+    os.makedirs(save_dir_path, exist_ok=True)
     df_today.to_csv(os.path.join(save_dir_path, "data.csv"))
 
 
@@ -29,7 +31,7 @@ def main(data_dir_path: str, n_jobs: int):
     args_calc_hourly_rain = []
     ob_folders = os.listdir(imputed_data_dir)
     for ob_folder in ob_folders:
-        folders = os.listdir(os.paht.join(imputed_data_dir, ob_folder))
+        folders = os.listdir(os.path.join(imputed_data_dir, ob_folder))
         if len(folders) == 0:
             continue
         for year_folder in folders:
@@ -62,7 +64,7 @@ def main(data_dir_path: str, n_jobs: int):
                         ob_folder,
                         year_folder,
                         month_folder,
-                        date.fromisoformat(data_folder) - timedelta(days=1),
+                        str(date.fromisoformat(data_folder) - timedelta(days=1)),
                         "data.csv",
                     )
                     if not os.path.exists(yesterday_csv_file_path):
@@ -79,7 +81,14 @@ def main(data_dir_path: str, n_jobs: int):
                     arg["save_dir_path"] = save_dir_path
                     arg["yesterday_csv_file_path"] = yesterday_csv_file_path
                     args_calc_hourly_rain.append(arg)
-        print(args_calc_hourly_rain[:5])
+    Parallel(n_jobs=n_jobs)(
+        delayed(calc_hourly_rain)(
+            csv_file_path=arg["csv_file_path"],
+            save_dir_path=arg["save_dir_path"],
+            yesterday_csv_file_path=arg["yesterday_csv_file_path"],
+        )
+        for arg in tqdm(args_calc_hourly_rain)
+    )
 
 
 if __name__ == "__main__":
