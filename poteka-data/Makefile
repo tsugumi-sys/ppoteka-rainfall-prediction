@@ -11,12 +11,28 @@ DATA_DIR=../data
 ###
 # Data cleaning
 ###
-.PHONY: data_clearning
-data_clearning:
+.PHONY: data_cleaning
+data_cleaning:
+	make extract_data && make impute_data && make calc_hourly_rain
+
+extract_data:
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && \
-	python processing/data-clearning/extract-data.py --data_dir_path=$(DATA_DIR) && \
-	python processing/data-clearning/data-imputation.py --data_dir_path=$(DATA_DIR) && \
-	python processing/data-clearning/accumurate-raf.py --data_dir_path=$(DATA_DIR)
+	python processing/data-cleaning/extract-data.py \
+		--data_dir_path=$(DATA_DIR) \
+		--n_jobs=10 \
+		--target_years=2019/2020
+
+impute_data:
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && \
+	python processing/data-cleaning/data-imputation.py \
+		--data_dir_path=$(DATA_DIR) \
+		--n_jobs=10
+		
+calc_hourly_rain:
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && \
+	python processing/data-cleaning/accumulate-raf.py \
+		--data_dir_path=$(DATA_DIR) \
+		--n_jobs=10
 
 ###
 # Interpolation

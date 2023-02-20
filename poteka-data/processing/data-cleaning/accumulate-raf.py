@@ -1,93 +1,85 @@
 import argparse
+import multiprocessing
 import os
 from datetime import date, timedelta
+from typing import Optional
 
 import pandas as pd
 
 
-def main(data_dir_path: str):
-    folder_path = os.path.join(data_dir_path, "imputed-data")
-    ob_folders = os.listdir(folder_path)
-    for ob_folder in ob_folders:
-        folders = os.listdir(folder_path + f"/{ob_folder}")
-        if folders:
-            for year_folder in folders:
-                month_folders = os.listdir(folder_path + f"/{ob_folder}/{year_folder}")
-                if month_folders:
-                    for month_folder in month_folders:
-                        data_folders = os.listdir(
-                            folder_path + f"/{ob_folder}/{year_folder}/{month_folder}"
-                        )
-                        if data_folders:
-                            for data_folder in data_folders:
-                                data_file = (
-                                    folder_path
-                                    + f"/{ob_folder}/{year_folder}/{month_folder}/{data_folder}/data.csv"
-                                )
-                                if os.path.exists(data_file):
-                                    print("-" * 60)
-                                    print(data_file)
-                                    today = data_folder
-                                    yesterday = date.fromisoformat(today) - timedelta(
-                                        days=1
-                                    )
-                                    df_today = pd.read_csv(
-                                        data_file, index_col="Datetime"
-                                    )
-                                    yesterday_path = (
-                                        folder_path
-                                        + f"/{ob_folder}/{year_folder}/{month_folder}/{yesterday}/data.csv"
-                                    )
-                                    if os.path.exists(yesterday_path):
-                                        df_yesterday = pd.read_csv(
-                                            yesterday_path, index_col="Datetime"
-                                        )
-                                        df = pd.concat([df_yesterday, df_today])
-                                        df["hour-rain"] = (
-                                            df["RAF"].rolling(60, min_periods=1).sum()
-                                        )
-                                        df_today["hour-rain"] = df["hour-rain"].loc[
-                                            df_today.index
-                                        ]
+def calc_horly_rain(
+    csv_file_path: str,
+    save_dir_path: str,
+    yesterday_csv_file_path: Optional[str] = None,
+) -> None:
+    df_today = pd.read_csv(csv_file_path, index_col="Datetime")
+    df = df_today.copy()
+    if yesterday_csv_file_path is not None:
+        df_yesterday = pd.read_csv(yesterday_csv_file_path, index_col="Datetime")
+        df = pd.concat([df_yesterday, df])
+    df["hour-rain"] = df["RAF"].rolling(60, min_periods=1).sum()
+    df_today["hour-rain"] = df["hour-rain"].loc[df_today.index]
 
-                                        # save
-                                        save_path = os.path.join(
-                                            data_dir_path, "accumulated-raf-data"
-                                        )
-                                        f = [
-                                            ob_folder,
-                                            year_folder,
-                                            month_folder,
-                                            data_folder,
-                                        ]
-                                        for i in f:
-                                            save_path = save_path + f"/{i}"
-                                            print(save_path)
-                                            if not os.path.exists(save_path):
-                                                os.mkdir(save_path)
-                                        save_path = save_path + "/data.csv"
-                                        df_today.to_csv(save_path)
-                                    else:
-                                        df_today["hour-rain"] = (
-                                            df_today["RAF"]
-                                            .rolling(60, min_periods=1)
-                                            .sum()
-                                        )
-                                        # save
-                                        save_path = "../../../data/accumulated-raf-data"
-                                        f = [
-                                            ob_folder,
-                                            year_folder,
-                                            month_folder,
-                                            data_folder,
-                                        ]
-                                        for i in f:
-                                            save_path = save_path + f"/{i}"
-                                            print(save_path)
-                                            if not os.path.exists(save_path):
-                                                os.mkdir(save_path)
-                                        save_path = save_path + "/data.csv"
-                                        df_today.to_csv(save_path)
+    os.makedirs(save_dir_path, exists_ok=True)
+    df_today.to_csv(os.path.join(save_dir_path, "data.csv"))
+
+
+def main(data_dir_path: str, n_jobs: int):
+    imputed_data_dir = os.path.join(data_dir_path, "imputed-data")
+    args_calc_hourly_rain = []
+    ob_folders = os.listdir(imputed_data_dir)
+    for ob_folder in ob_folders:
+        folders = os.listdir(os.paht.join(imputed_data_dir, ob_folder))
+        if len(folders) == 0:
+            continue
+        for year_folder in folders:
+            month_folders = os.listdir(
+                os.path.join(imputed_data_dir, ob_folder, year_folder)
+            )
+            if len(month_folders) == 0:
+                continue
+            for month_folder in month_folders:
+                data_folders = os.listdir(
+                    os.path.join(imputed_data_dir, ob_folder, year_folder, month_folder)
+                )
+                if len(data_folders) == 0:
+                    continue
+                for data_folder in data_folders:
+                    arg = {}
+                    csv_file_path = os.path.join(
+                        imputed_data_dir,
+                        ob_folder,
+                        year_folder,
+                        month_folder,
+                        data_folder,
+                        "data.csv",
+                    )
+                    if not os.path.exists(csv_file_path):
+                        continue
+
+                    yesterday_csv_file_path = os.path.join(
+                        imputed_data_dir,
+                        ob_folder,
+                        year_folder,
+                        month_folder,
+                        date.fromisoformat(data_folder) - timedelta(days=1),
+                        "data.csv",
+                    )
+                    if not os.path.exists(yesterday_csv_file_path):
+                        yesterday_csv_file_path = None
+
+                    save_dir_path = os.path.join(
+                        data_dir_path,
+                        "accumulated-raf-data",
+                        ob_folder,
+                        month_folder,
+                        data_folder,
+                    )
+                    arg["csv_file_path"] = csv_file_path
+                    arg["save_dir_path"] = save_dir_path
+                    arg["yesterday_csv_file_path"] = yesterday_csv_file_path
+                    args_calc_hourly_rain.append(arg)
+        print(args_calc_hourly_rain[:5])
 
 
 if __name__ == "__main__":
@@ -98,5 +90,12 @@ if __name__ == "__main__":
         default="../../../data",
         help="The root path of the data directory.",
     )
+    parser.add_argument(
+        "--n_jobs", type=int, default=10, help="CPU counts for mutiprocessing.",
+    )
     args = parser.parse_args()
-    main(args.data_root_dir)
+    n_jobs = args.n_jobs
+    max_cpus = multiprocessing.cpu_count()
+    if n_jobs > multiprocessing.cpu_count():
+        n_jobs = max_cpus - 1
+    main(args.data_dir_path, n_jobs)
