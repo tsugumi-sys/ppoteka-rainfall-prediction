@@ -1,19 +1,23 @@
 import argparse
+import sys
+import itertools
 import json
 import os
+import re
 from pathlib import Path
 from typing import Dict, List
 
-import re
-import itertools
-
 import pandas as pd
 from pydantic import BaseModel
-from common.utils import timestep_csv_names
+
+sys.path.append(".")
+from common.utils import timestep_csv_names  # noqa
 
 
 def main(data_root_dir: str, max_rainfall_threshold: int = 5):
-    save_dir_path = os.path.join(Path(data_root_dir).parent, "poteka-pipeline-pytorch/preprocess/src")
+    save_dir_path = os.path.join(
+        Path(data_root_dir).parent, "poteka-pipeline-pytorch/preprocess/src"
+    )
     with open(os.path.join(save_dir_path, "test_dataset.json"), "r") as f:
         test_cases = json.load(f)
     test_case_dates = get_test_case_dates(test_cases)
@@ -39,8 +43,15 @@ class RainfallInfo(BaseModel):
     duration: int = 0
 
     def __repr__(self):
-        return f"""RainfallInfo(date={self.date}, start_time={self.start_time}, peak_time={self.peak_time}, end_time={self.end_time},
-        max_rainfall={self.max_rainfall}, duration={self.duration})"""
+        return f"""
+        RainfallInfo(
+            date={self.date},
+            start_time={self.start_time},
+            peak_time={self.peak_time},
+            end_time={self.end_time},
+            max_rainfall={self.max_rainfall},
+            duration={self.duration}
+        )"""
 
 
 def list_dir_by_pattern(root_dir_path: str, regex_pattern: str) -> List:
@@ -96,9 +107,9 @@ def search_rainfalls_in_a_day(
         # rain ends and store information
         if rainfall_info.start_time is not None and df["hour-rain"].max() < 5:
             rainfall_info.end_time = csv_filename.replace(".csv", "")
-            duration = _timestep_csv_names.index(rainfall_info.end_time + ".csv") - _timestep_csv_names.index(
-                rainfall_info.start_time + ".csv"
-            )
+            duration = _timestep_csv_names.index(
+                rainfall_info.end_time + ".csv"
+            ) - _timestep_csv_names.index(rainfall_info.start_time + ".csv")
             duration *= 10
             if duration > minimum_rainfall_duration_minutes:
                 rainfall_info.duration = duration
@@ -109,11 +120,15 @@ def search_rainfalls_in_a_day(
         if len(df.index) < minimum_data_length:
             minimum_data_length = len(df.index)
     # rain do not end in the day
-    if minimum_data_length > 0 and rainfall_info.start_time is not None and rainfall_info.end_time is None:
+    if (
+        minimum_data_length > 0
+        and rainfall_info.start_time is not None
+        and rainfall_info.end_time is None
+    ):
         rainfall_info.end_time = csv_filename.replace(".csv", "")
-        duration = _timestep_csv_names.index(rainfall_info.end_time + ".csv") - _timestep_csv_names.index(
-            rainfall_info.start_time + ".csv"
-        )
+        duration = _timestep_csv_names.index(
+            rainfall_info.end_time + ".csv"
+        ) - _timestep_csv_names.index(rainfall_info.start_time + ".csv")
         duration *= 10
         if duration > minimum_rainfall_duration_minutes:
             rainfall_info.duration = duration
@@ -121,7 +136,9 @@ def search_rainfalls_in_a_day(
     return results
 
 
-def search_rainfalls(data_root_dir: str, max_rainfall_threshold: int = 5) -> pd.DataFrame:
+def search_rainfalls(
+    data_root_dir: str, max_rainfall_threshold: int = 5
+) -> pd.DataFrame:
     years = ["2019", "2020"]
     monthes = [stringify_interger_month(m) for m in range(1, 13)]
     root_dir = os.path.join(data_root_dir, "one_day_data")

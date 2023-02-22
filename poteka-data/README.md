@@ -24,7 +24,9 @@ cleaning has 3 processes.
 
 Run the following command.
 
-`make data_cleaning`
+```bash
+make data_cleaning
+```
 
 After cleaning step, the `data/` folder is as follows.
 
@@ -61,11 +63,15 @@ and visualized map are saved in each weather parameter directories (e.g.
 
 Run the following commands as the first step (creating `one-data-data`).
 
-`make create_oneday_data`
+```bash
+make create_oneday_data
+```
 
 Then run the following commands for interpolation.
 
-`make interpolation`
+```bash
+make interpolation
+```
 
 After interpolation step, the `data/` folder is as follows.
 
@@ -85,6 +91,8 @@ After interpolation step, the `data/` folder is as follows.
 
 ### Selecting training and test datasets.
 
+#### Overview
+
 1. Selecting test datasets. The test case meta file `test_dataset.json` are
    created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. Modify
    `processing/select_test_dataset.py` for customing test cases.
@@ -92,6 +100,12 @@ After interpolation step, the `data/` folder is as follows.
    created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. The data
    selected in test case is dropped so `test_dataset.json` is needed for this
    process.
+  
+#### Commands
+
+```bash
+make select_train_dataset && make select_test_dataset
+```
    
 After this process, new files are placed as follows.
 
