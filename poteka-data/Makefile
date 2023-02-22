@@ -49,47 +49,39 @@ create_oneday_data:
 
 .PHONY: interpolation
 interpolation:
-	make preprocess_pressure_data && make preprocess_slp_data && \
-	make preprocess_humidity_data && \
-	make preprocess_temp_data && \
-	make preprocess_wind_data && make preprocess_abs_wind_data && \
-	make preprocess_rain_data
+	make interpolate_pressure_data && make interpolate_slp_data && \
+	make interpolate_humidity_data && \
+	make interpolate_temp_data && \
+	make interpolate_wind_data && make interpolate_abs_wind_data && \
+	make interpolate_rain_data
 
-preprocess_pressure_data:
+interpolate_pressure_data:
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_PRS_SLP_image.py \
 		--data_root_path=$(DATA_DIR) \
-		--target=prs \
-		--n_jobs=$(N_CPUS) 
+		--time_step_minutes=$(TIME_STEP_MINUTES) \
+		--n_jobs=$(N_CPUS) \
+		--target=slp
 
-preprocess_slp_data: 
-	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_PRS_SLP_image.py \
-		--data_root_path=$(DATA_DIR) \
-		--target=slp \
-		--n_jobs=$(N_CPUS) 
-
-preprocess_humidity_data: 
+interpolate_humidity_data: 
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_humidity_image.py \
 		--data_root_path=$(DATA_DIR) \
+		--time_step_minutes=$(TIME_STEP_MINUTES) \
 		--n_jobs=$(N_CPUS) 
 
-preprocess_temp_data: 
+interpolate_temp_data: 
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_temp_image.py \
 		--data_root_path=$(DATA_DIR) \
+		--time_step_minutes=$(TIME_STEP_MINUTES) \
 		--n_jobs=$(N_CPUS) 
 
-preprocess_wind_data: 
+interpolate_wind_data: 
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_wind_image.py \
 		--data_root_path=$(DATA_DIR) \
-		--n_jobs=$(N_CPUS) \
-		--target=uv
-
-preprocess_abs_wind_data: 
-	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_wind_image.py \
-		--data_root_path=$(DATA_DIR) \
+		--time_step_minutes=$(TIME_STEP_MINUTES) \
 		--n_jobs=$(N_CPUS) \
 		--target=abs
 
-preprocess_rain_data: 
+interpolate_rain_data: 
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_rain_image.py \
 		--data_root_path=$(DATA_DIR) \
 		--time_step_minutes=$(TIME_STEP_MINUTES) \

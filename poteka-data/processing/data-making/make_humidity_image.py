@@ -1,34 +1,29 @@
+import argparse
+import multiprocessing
+import os
+import sys
+from logging import INFO, StreamHandler, basicConfig, getLogger
+from typing import Union
+
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.colors as mcolors
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-import os
-from scipy.interpolate import RBFInterpolator
-from matplotlib import cm
-import argparse
-import sys
-from typing import Union
-from logging import getLogger, INFO, basicConfig, StreamHandler
-import multiprocessing
+import numpy as np
+import pandas as pd
 from joblib import Parallel, delayed
+from matplotlib import cm
+from scipy.interpolate import RBFInterpolator
 from tqdm import tqdm
-from utils import gen_data_config, tqdm_joblib
+
+from utils import gen_data_config
 
 sys.path.append(".")
-from common.send_info import send_line  # noqa: E402
+from common.send_info import send_notify  # noqa: E402
 from common.validations import is_ymd_valid  # noqa: E402
-
 
 logger = getLogger(__name__)
 logger.setLevel(INFO)
-basicConfig(
-    level=INFO,
-    filename="./dataset/data-making/log/create_humidity_data.log",
-    filemode="w",
-    format="%(asctime)s %(levelname)s %(name)s :%(message)s",
-)
 logger.addHandler(StreamHandler(sys.stdout))
 
 
@@ -40,24 +35,11 @@ def make_img(
     month: Union[str, int],
     date: Union[str, int],
 ) -> None:
-    print("Creating", date, "data ...")
-    basicConfig(
-        level=INFO,
-        filename="./dataset/data-making/log/create_humidity_data.log",
-        filemode="a",
-        format="%(asctime)s %(levelname)s %(name)s :%(message)s",
-    )
-
     img_title = "Relative Humidity"
+    os.makedirs(save_dir_path, exist_ok=True)
     is_data_file_exists = os.path.exists(data_file_path)
-    is_save_dir_exists = os.path.exists(save_dir_path)
 
-    if (
-        is_data_file_exists
-        and is_save_dir_exists
-        and is_ymd_valid(year, month, date, data_file_path)
-    ):
-        # try:
+    if is_data_file_exists and is_ymd_valid(year, month, date, data_file_path):
         df = pd.read_csv(data_file_path, index_col=0)
         rbfi = RBFInterpolator(
             y=df[["LON", "LAT"]], d=df["RH1"], kernel="linear", epsilon=10,
@@ -114,15 +96,9 @@ def make_img(
         save_df.to_csv(save_csv_path)
 
         plt.close()
-    # except:
-    #     logger.exception(
-    #         f"Creating data of {data_file_path} has failed with some erors"
-    #     )
     else:
         if not is_data_file_exists:
             print("[Error]: data_file_path: %s does not exist.", data_file_path)
-        elif not is_save_dir_exists:
-            print("[Error]: save_dir_path: %s does not exist.", save_dir_path)
         else:
             print(
                 "[Error]: Year: %s, Month: %s, Date: %s does not match with %s",
@@ -141,16 +117,38 @@ if __name__ == "__main__":
         default="../../../data",
         help="The root path of the data directory.",
     )
-
+    parser.add_argument(
+        "--log_dir",
+        type=str,
+        default="log",
+        help="The path of a directory to store log files.",
+    )
+    parser.add_argument(
+        "--time_step_minutes",
+        type=int,
+        default=10,
+        help="The time step (minutes) of dataset time resolusion.",
+    )
     parser.add_argument(
         "--n_jobs", type=int, default=1, help="The number of cpus to use.",
     )
 
     args = parser.parse_args()
 
+    log_dir = args.log_dir
+    os.makedirs(log_dir, exist_ok=True)
+    basicConfig(
+        level=INFO,
+        filename=os.path.join(log_dir, "interpolate_humidity_data.log"),
+        filemode="w",
+        format="%(asctime)s %(levelname)s %(name)s :%(message)s",
+    )
+
     save_dir_name = "humidity_image"
     confs = gen_data_config(
-        data_root_path=args.data_root_path, save_dir_name=save_dir_name
+        data_root_path=args.data_root_path,
+        save_dir_name=save_dir_name,
+        time_step_minutes=args.time_step_minutes,
     )
     n_jobs = args.n_jobs
 
@@ -158,21 +156,15 @@ if __name__ == "__main__":
     if n_jobs > max_cores:
         n_jobs = max_cores
 
-    print("Creating humidity data")
-    # with tqdm_joblib(tqdm(desc="Create humidity data", total=len(confs))):
-    try:
-        Parallel(n_jobs=n_jobs)(
-            delayed(make_img)(
-                data_file_path=conf["data_file_path"],
-                csv_file_name=conf["csv_file_name"],
-                save_dir_path=conf["save_dir_path"],
-                year=conf["year"],
-                month=conf["month"],
-                date=conf["date"],
-            )
-            for conf in confs
+    Parallel(n_jobs=n_jobs)(
+        delayed(make_img)(
+            data_file_path=conf["data_file_path"],
+            csv_file_name=conf["csv_file_name"],
+            save_dir_path=conf["save_dir_path"],
+            year=conf["year"],
+            month=conf["month"],
+            date=conf["date"],
         )
-    except:
-        send_line("Error while creating humidity image")
-
-    send_line("Creating humidity data has finished.")
+        for conf in tqdm(confs)
+    )
+    send_notify("Creating humidity data has finished.")

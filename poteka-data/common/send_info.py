@@ -1,18 +1,17 @@
-from dotenv import load_dotenv
-from pathlib import Path
 import requests
 import os
 from logging import getLogger, INFO
 from typing import Optional
 
-dotenv_path = Path(".env")
-load_dotenv(dotenv_path=dotenv_path)
-
 logger = getLogger(__name__)
 logger.setLevel(INFO)
 
 
-def send_line(msg: str) -> Optional[int]:
+def send_notify(msg: str) -> Optional[int]:
+    """
+    Replace your prefer notification services.
+    This is LINE notify Example.
+    """
     line_notify_token = os.getenv("LINE_TOKEN")
 
     if line_notify_token is None:

@@ -25,7 +25,7 @@ from tqdm import tqdm
 from utils import gen_data_config
 
 sys.path.append(".")  # relative path from where this file runs.
-from common.send_info import send_line  # noqa: E402
+from common.send_info import send_notify  # noqa: E402
 from common.validations import is_ymd_valid  # noqa: E402
 
 logger = getLogger(__name__)
@@ -54,13 +54,6 @@ def make_img(
         df["hour-rain"] = np.where(
             df["hour-rain"] > 0, df["hour-rain"], round(random.uniform(0.1, 0.8), 5),
         )
-
-        # rbfi = RBFInterpolator(
-        #     y=df[["LON", "LAT"]],
-        #     d=df["hour-rain"],
-        #     kernel="gaussian",
-        #     epsilon=61,
-        # )
 
         # Gaussian Process Regressor
         kernel = C(1, (1e-5, 1e5)) * RBF(1, (1e-5, 1e5))
@@ -140,10 +133,6 @@ def make_img(
         save_df.to_csv(save_csv_path)
 
         plt.close()
-    # except:
-    #     print(
-    #         f"[Exception]: Creating data of {data_file_path} has failed with some errors."
-    #     )
 
     else:
         if not is_data_file_exists:
@@ -196,13 +185,12 @@ if __name__ == "__main__":
         save_dir_name=save_dir_name,
         time_step_minutes=args.time_step_minutes,
     )
-    n_jobs = args.n_jobs
 
+    n_jobs = args.n_jobs
     max_cores = multiprocessing.cpu_count()
     if n_jobs > max_cores:
         n_jobs = max_cores
 
-    # with tqdm_joblib(tqdm(desc="Create rain data", total=len(confs))):
     Parallel(n_jobs=n_jobs)(
         delayed(make_img)(
             data_file_path=conf["data_file_path"],
@@ -214,4 +202,4 @@ if __name__ == "__main__":
         )
         for conf in tqdm(confs)
     )
-    send_line("Creating rain data has finished")
+    send_notify("Creating rain data has finished")

@@ -1,36 +1,31 @@
 # from metpy.units import units
 # from metpy.calc import wind_components
+import argparse
+import multiprocessing
+import os
+import sys
+from logging import INFO, StreamHandler, basicConfig, getLogger
+from typing import Union
+
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.colors as mcolors
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-import os
-from scipy.interpolate import RBFInterpolator
-from matplotlib import cm
-import sys
-import argparse
-from typing import Union
-from logging import getLogger, INFO, basicConfig, StreamHandler
-import multiprocessing
+import numpy as np
+import pandas as pd
 from joblib import Parallel, delayed
+from matplotlib import cm
+from scipy.interpolate import RBFInterpolator
 from tqdm import tqdm
-from utils import gen_data_config, tqdm_joblib
+
+from utils import gen_data_config
 
 sys.path.append(".")
-from common.send_info import send_line  # noqa: E402
+from common.send_info import send_notify  # noqa: E402
 from common.validations import is_ymd_valid  # noqa: E402
-
 
 logger = getLogger(__name__)
 logger.setLevel(INFO)
-basicConfig(
-    level=INFO,
-    filename="./dataset/data-making/log/create_wind_data.log",
-    filemode="w",
-    format="%(asctime)s %(levelname)s %(name)s :%(message)s",
-)
 logger.addHandler(StreamHandler(sys.stdout))
 
 
@@ -40,7 +35,6 @@ def calc_u_v(df, ob_point):
 
     rads = np.radians(float(wind_dir))
     wind_u, wind_v = -1 * wind_speed * np.cos(rads), -1 * wind_speed * np.sin(rads)
-    # wind_u_v = wind_components(wind_speed * units("m/s"), wind_dir * units.deg)
 
     return [
         ob_point,
@@ -57,24 +51,11 @@ def make_abs_img(
     month: Union[str, int],
     date: Union[str, int],
 ) -> None:
-    print("Creating", date, "data ...")
-    basicConfig(
-        level=INFO,
-        filename="./dataset/data-making/log/create_wind_data.log",
-        filemode="a",
-        format="%(asctime)s %(levelname)s %(name)s :%(message)s",
-    )
-
     img_title = "wind speed (meter/second)"
+    os.makedirs(save_dir_path, exist_ok=True)
     is_data_file_exists = os.path.exists(data_file_path)
-    is_save_dir_exists = os.path.exists(save_dir_path)
 
-    if (
-        is_data_file_exists
-        and is_save_dir_exists
-        and is_ymd_valid(year, month, date, data_file_path)
-    ):
-        # try:
+    if is_data_file_exists and is_ymd_valid(year, month, date, data_file_path):
         df = pd.read_csv(data_file_path, index_col=0)
         # Check and replace outliers
         ws1_outlier_threshold = df["WS1"].quantile(0.98)
@@ -138,14 +119,9 @@ def make_abs_img(
         save_df.to_csv(save_csv_path)
 
         plt.close()
-    # except:
-    #     logger.exception(f"Creating data of {data_file_path} has failed with some erors")
-
     else:
         if not is_data_file_exists:
             print("[Error]: data_file_path: %s does not exist.", data_file_path)
-        elif not is_save_dir_exists:
-            print("[Error]: save_dir_path: %s does not exist.", save_dir_path)
         else:
             print(
                 "[Error]: Year: %s, Month: %s, Date: %s does not match with %s",
@@ -164,24 +140,11 @@ def make_uv_img(
     month: Union[str, int],
     date: Union[str, int],
 ) -> None:
-    print("Creating", date, "data ...")
-    basicConfig(
-        level=INFO,
-        filename="./dataset/data-making/log/create_wind_data.log",
-        filemode="a",
-        format="%(asctime)s %(levelname)s %(name)s :%(message)s",
-    )
-
     img_title = "wind speed (m/second)"
+    os.makedirs(save_dir_path, exist_ok=True)
     is_data_file_exists = os.path.exists(data_file_path)
-    is_save_dir_exists = os.path.exists(save_dir_path)
 
-    if (
-        is_data_file_exists
-        and is_save_dir_exists
-        and is_ymd_valid(year, month, date, data_file_path)
-    ):
-        # try:
+    if is_data_file_exists and is_ymd_valid(year, month, date, data_file_path):
         df = pd.read_csv(data_file_path, index_col=0)
         # Check and replace outliers
         ws1_outlier_threshold = df["WS1"].quantile(0.98)
@@ -216,25 +179,6 @@ def make_uv_img(
         v_wind = np.where(v_wind < -10, -10, v_wind)
         u_wind = np.where(z_u_wind > 10, 10, z_u_wind)
         u_wind = np.where(u_wind < -10, -10, u_wind)
-
-        # Calculate divergence
-        # v_wind_grad = np.array(np.gradient(v_wind)[1])
-        # u_wind_grad = np.array(np.gradient(u_wind)[0])
-        # wind_div = np.empty([grid_size, grid_size])
-        # for i in range(grid_size):
-        #     for j in range(grid_size):
-        #         x_left = i - 1 if i - 1 > 0 else 0
-        #         x_right = i + 1 if i + 1 < grid_size - 1 else grid_size - 1
-        #         y_above = j + 1 if j + 1 < grid_size - 1 else grid_size - 1
-        #         y_bottom = j - 1 if j - 1 > 0 else 0
-        #         val = 0
-        #         for x in range(x_left, x_right + 1):
-        #             for y in range(y_bottom, y_above + 1):
-        #                 val += v_wind_grad[x, y] + u_wind_grad[x, y]
-        #         wind_div[i, j] = val
-        # wind_div = np.where(wind_div > 10, 10, wind_div)
-        # wind_div = np.where(wind_div < -10, -10, wind_div)
-        # print(wind_div.max(), wind_div.min())
 
         # Save Image and CSV
         save_path = save_dir_path
@@ -292,16 +236,9 @@ def make_uv_img(
         vwind_df.index = grid_lat[::-1]
         uwind_df.to_csv(save_csv_path.replace(".csv", "U.csv"))
         vwind_df.to_csv(save_csv_path.replace(".csv", "V.csv"))
-    # except:
-    #     logger.exception(
-    #         f"Creating data of {data_file_path} has failed with some erors"
-    #     )
-
     else:
         if not is_data_file_exists:
             print("[Error]: data_file_path: %s does not exist.", data_file_path)
-        elif not is_save_dir_exists:
-            print("[Error]: save_dir_path: %s does not exist.", save_dir_path)
         else:
             print(
                 "[Error]: Year: %s, Month: %s, Date: %s does not match with %s",
@@ -313,73 +250,80 @@ def make_uv_img(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="process humidity data.")
+    parser = argparse.ArgumentParser(description="process wind data.")
     parser.add_argument(
         "--data_root_path",
         type=str,
         default="../../../data",
         help="The root path of the data directory.",
     )
-
+    parser.add_argument(
+        "--log_dir",
+        type=str,
+        default="log",
+        help="The path of a directory to store log files.",
+    )
+    parser.add_argument(
+        "--time_step_minutes",
+        type=int,
+        default=10,
+        help="The time step (minutes) of dataset time resolusion.",
+    )
     parser.add_argument(
         "--n_jobs", type=int, default=1, help="The number of cpus to use.",
     )
-
     parser.add_argument(
         "--target", type=str, default="abs", help="Taget name (abs or uv).",
     )
 
     args = parser.parse_args()
 
+    log_dir = args.log_dir
+    os.makedirs(log_dir, exist_ok=True)
+    basicConfig(
+        level=INFO,
+        filename=os.path.join(log_dir, "interpolate_temperature_data.log"),
+        filemode="w",
+        format="%(asctime)s %(levelname)s %(name)s :%(message)s",
+    )
+
     target = args.target
 
     if target not in ["abs", "uv"]:
-        logger.error('--target shoud be "abs" or "uv"')
-    else:
-        save_dir_name = "abs_wind_image" if target == "abs" else "wind_image"
-        confs = gen_data_config(
-            data_root_path=args.data_root_path, save_dir_name=save_dir_name
+        raise ValueError(f'--target shoud be "abs" or "uv", instead of {target}')
+
+    save_dir_name = "abs_wind_image" if target == "abs" else "wind_image"
+    confs = gen_data_config(
+        data_root_path=args.data_root_path, save_dir_name=save_dir_name
+    )
+    n_jobs = args.n_jobs
+
+    max_cores = multiprocessing.cpu_count()
+    if n_jobs > max_cores:
+        n_jobs = max_cores
+
+    if target == "abs":
+        Parallel(n_jobs=n_jobs)(
+            delayed(make_abs_img)(
+                data_file_path=conf["data_file_path"],
+                csv_file_name=conf["csv_file_name"],
+                save_dir_path=conf["save_dir_path"],
+                year=conf["year"],
+                month=conf["month"],
+                date=conf["date"],
+            )
+            for conf in tqdm(confs)
         )
-        n_jobs = args.n_jobs
-
-        max_cores = multiprocessing.cpu_count()
-        if n_jobs > max_cores:
-            n_jobs = max_cores
-
-        if target == "abs":
-            print("Creating abs wind data")
-            # with tqdm_joblib(tqdm(desc="Create abs wind data", total=len(confs))):
-            try:
-                Parallel(n_jobs=n_jobs)(
-                    delayed(make_abs_img)(
-                        data_file_path=conf["data_file_path"],
-                        csv_file_name=conf["csv_file_name"],
-                        save_dir_path=conf["save_dir_path"],
-                        year=conf["year"],
-                        month=conf["month"],
-                        date=conf["date"],
-                    )
-                    for conf in confs
-                )
-            except:
-                send_line("Error while creating wind data.")
-
-        else:
-            # with tqdm_joblib(tqdm(desc="Create uv wind data.", total=len(confs))):
-            print("Creating uv wind data")
-            try:
-                Parallel(n_jobs=n_jobs)(
-                    delayed(make_uv_img)(
-                        data_file_path=conf["data_file_path"],
-                        csv_file_name=conf["csv_file_name"],
-                        save_dir_path=conf["save_dir_path"],
-                        year=conf["year"],
-                        month=conf["month"],
-                        date=conf["date"],
-                    )
-                    for conf in confs
-                )
-            except:
-                send_line("Error while creating wind data.")
-
-        send_line("Creating wind data has finished.")
+    else:
+        Parallel(n_jobs=n_jobs)(
+            delayed(make_uv_img)(
+                data_file_path=conf["data_file_path"],
+                csv_file_name=conf["csv_file_name"],
+                save_dir_path=conf["save_dir_path"],
+                year=conf["year"],
+                month=conf["month"],
+                date=conf["date"],
+            )
+            for conf in tqdm(confs)
+        )
+    send_notify("Creating wind data has finished.")
