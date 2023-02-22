@@ -8,6 +8,9 @@ CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activ
 ###
 CONDA_ENV_NAME=p-poteka
 DATA_DIR=../data
+N_CPUS=13
+TIME_STEP_MINUTES=10 
+
 ###
 # Data cleaning
 ###
@@ -37,22 +40,20 @@ calc_hourly_rain:
 ###
 # Interpolation
 ###
-N_CPUS=13
-# minutes.
-TIME_STEP=10
-	
-preprocess_data:
+.PHONY: create_oneday_data
+create_oneday_data:
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_oneday_data.py \
+		--data_root_dir=$(DATA_DIR) \
+		--n_jobs=$(N_CPUS) \
+		--delta=$(TIME_STEP_MINUTES)
+
+.PHONY: interpolation
+interpolation:
 	make preprocess_pressure_data && make preprocess_slp_data && \
 	make preprocess_humidity_data && \
 	make preprocess_temp_data && \
 	make preprocess_wind_data && make preprocess_abs_wind_data && \
 	make preprocess_rain_data
-	
-preprocess_oneday_data:
-	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_oneday_data.py \
-		--data_root_dir=$(DATA_DIR) \
-		--n_jobs=$(N_CPUS) \
-		--delta=$(TIME_STEP)
 
 preprocess_pressure_data:
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_PRS_SLP_image.py \
@@ -91,6 +92,7 @@ preprocess_abs_wind_data:
 preprocess_rain_data: 
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/make_rain_image.py \
 		--data_root_path=$(DATA_DIR) \
+		--time_step_minutes=$(TIME_STEP_MINUTES) \
 		--n_jobs=$(N_CPUS)
 
 
@@ -105,4 +107,4 @@ select_train_dataset:
 select_test_dataset:
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python processing/data-making/select_test_dataset.py \
 		--data_root_dir=$(DATA_DIR) \
-		--timestep_delta=$(TIME_STEP)
+		--timestep_delta=$(TIME_STEP_MINUTES)

@@ -7,6 +7,8 @@ dataaset with commands in `Makefile`.
 
 ### Cleaning
 
+#### Overview
+
 cleaning has 3 processes.
 
 1. **Raw data scaling and format datetime**: Read the data from the raw ppoteka
@@ -17,6 +19,12 @@ cleaning has 3 processes.
    `data/imputed_data/` directory.
 3. **Accumulation of rainfall data**: Hourly rainfall amount is calculated.
    Finally the data is saved into `data/accumulated-raf-data/` directory.
+
+#### Commands
+
+Run the following command.
+
+`make data_cleaning`
 
 After cleaning step, the `data/` folder is as follows.
 
@@ -32,7 +40,9 @@ After cleaning step, the `data/` folder is as follows.
 
 ### Interpolation
 
-#### First step
+#### Overview
+
+##### First step
 
 Before interpolation, combining all observation points data of the same datetime
 is created.
@@ -41,11 +51,21 @@ is created.
   same datetime in `data/accumulated-raf-data`, then combine them into a single
   csv files.
 
-#### Interpolation step.
+##### Interpolation step.
 
 Creating grid data from the observation points data. The interpolated grid data
 and visualized map are saved in each weather parameter directories (e.g.
 `data/rain_image/`, `data/temp_image/`).
+
+#### Commands
+
+Run the following commands as the first step (creating `one-data-data`).
+
+`make create_oneday_data`
+
+Then run the following commands for interpolation.
+
+`make interpolation`
 
 After interpolation step, the `data/` folder is as follows.
 

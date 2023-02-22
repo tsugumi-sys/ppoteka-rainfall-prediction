@@ -1,30 +1,34 @@
+import contextlib
 import os
 import sys
-from typing import Union, Dict, List
-import contextlib
+from typing import Dict, List, Union
+
 import joblib
 
 sys.path.append(".")
-from common.utils import timestep_csv_names
+from common.utils import timestep_csv_names  # noqa
 
 
 def gen_data_config(
-    data_root_path: str, save_dir_name: str,
+    data_root_path: str, save_dir_name: str, time_step_minutes: int = 10,
 ) -> List[Dict[str, Union[str, int]]]:
     data_configs = []
-    root_folder_path = data_root_path + "/one_day_data"
-    save_dir_path = data_root_path + f"/{save_dir_name}"
+    root_folder_path = os.path.join(data_root_path, "one_day_data")
+    save_dir_path = os.path.join(data_root_path, save_dir_name)
 
     for year in os.listdir(root_folder_path):
-        for month in os.listdir(root_folder_path + f"/{year}"):
-            for date in os.listdir(root_folder_path + f"/{year}/{month}"):
-                if len(os.listdir(root_folder_path + f"/{year}/{month}/{date}")) > 0:
+        for month in os.listdir(os.path.join(root_folder_path, year)):
+            for date in os.listdir(os.path.join(root_folder_path, year, month)):
+                if (
+                    len(os.listdir(os.path.join(root_folder_path, year, month, date)))
+                    > 0
+                ):
                     # csv_file_names = os.listdir(root_folder_path + f"/{year}/{month}/{date}")
-                    _timestep_csv_names = timestep_csv_names(delta=5)
+                    _timestep_csv_names = timestep_csv_names(delta=time_step_minutes)
                     for csv_file_name in _timestep_csv_names:
                         # parquet_file_name = csv_file_name.replace(".csv", ".parquet.gzip")
-                        data_file_path = (
-                            root_folder_path + f"/{year}/{month}/{date}/{csv_file_name}"
+                        data_file_path = os.path.join(
+                            root_folder_path, year, month, date, csv_file_name
                         )
                         conf = {}
                         conf["data_file_path"] = data_file_path

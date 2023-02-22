@@ -74,6 +74,7 @@ def main(data_dir_path: str, n_jobs: int):
                         data_dir_path,
                         "accumulated-raf-data",
                         ob_folder,
+                        year_folder,
                         month_folder,
                         data_folder,
                     )
