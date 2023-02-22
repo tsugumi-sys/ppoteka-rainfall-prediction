@@ -54,7 +54,9 @@ Modify `pipeline_root_dir_path` in `conf/config.yaml`
 ###
 # Path info
 ###
-pipeline_root_dir_path: {Put your path. Note that this path should be pipeline (poteka-pipeline-pytorch) root, not project root.}
+pipeline_root_dir_path: your/path
+## Put your path. Note that this path should be
+## pipeline (poteka-pipeline-pytorch) root, not project root.
 
 ...
 
@@ -88,14 +90,16 @@ Set `CONDA_ENV_NAME` and `EXPERIMENT_NAME` (mlflow experiment name) and
 `MODEL_NAME` (the target model) in `./Makefile`.
 
 ```Makefile
+// ./Makefile
 ...
 ###
 # Common parameters
 ###
-CONDA_ENV_NAME = poteka-pipeline-pytorch
-EXPERIMENT_NAME = Conv-vs-SA
-MODEL_NAME = SAMSeq2Seq
+CONDA_ENV_NAME = your-conda-env-name
+EXPERIMENT_NAME = your-mlflow-experiment-name
+MODEL_NAME = SAMSeq2Seq # or Seq2Seq, SASeq2Seq
 ...
 ```
 
 Change parameters in `conf/` and run commands in `Makefile`.
+See comments in the makefile for more information.
