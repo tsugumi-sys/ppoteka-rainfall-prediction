@@ -38,7 +38,7 @@ input_parameters: rain/temperature/humidity
 ###
 # Path info
 ###
-pipeline_root_dir_path: /home/akira/Desktop/p-poteka/poteka-pipeline-pytorch
+pipeline_root_dir_path: /home/akira/Desktop/p-poteka/ppoteka-rainfall-prediction/poteka-pipeline-pytorch
 
 ###
 # Hydra settings

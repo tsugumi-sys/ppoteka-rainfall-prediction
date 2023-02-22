@@ -9,16 +9,26 @@ See [API documents](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/)
 
 ### Flow of pipeline
 
-1. **Preprocessing:** Split all P-POTEKA datasets into train, validation and
-   evaluation datasets and store its metadata.
-2. **Training:** Train the target model with training datasets, prepared in
-   preprocess step and store the model's parameters and learning curves, e.t.c.
-3. **Evaluation:** Evaluate the trained model using the evaluation dataset.
+1. **Preprocessing:** All P-POTEKA datasets into train, validation and
+   evaluation datasets and store its metadata in this process.
+2. **Training:** Train and validation datasets, prepared in preprocessing process are loaded.
+  Then the target model trained with hyperparameters and other parameters
+  defined in configuration files (all configuration are managed by `hydra` in `conf/` directory).
+  ![Sequential Prediction](./fig/sequential_prediction.png)
+3. **Evaluation:** The trained model is evaluated using the evaluation dataset. There are 3 types of evaluations.
+- NormalEvaluation: The model's output is the sequences of frames.
+- SequentialEvaluation: The modle's output is a single frame. The model uses 
+  the past predictions to predict next frames.
+- CombineModelsEvaluation: The multiple parameter models (like `rain/humidity/temperature`) is trained
+  and also single parameter models are trained (`rain`, 'humidity' and `temperature` separately)  in training process.
+  The single parameter models predicts its parameter, the temperature model predicts temperature. Then, these predction
+  results are used when the multiple parameter predicts sequentially.
+  ![Combine Models Prediction](./fig/combine_models_prediction.png)
 
 ### Tools
 
 - `mlflow`: Building pipeline and UI tool.
-- `hydra`: Maning hyper parameters e.t.c.
+- `hydra`: Managing hyper parameters and other parameters, e.t.c.
 - `torch`: Defining machine learning models.
 
 ### Models
@@ -55,8 +65,9 @@ Modify `pipeline_root_dir_path` in `conf/config.yaml`
 # Path info
 ###
 pipeline_root_dir_path: your/path
-## Put your path. Note that this path should be
-## pipeline (poteka-pipeline-pytorch) root, not project root.
+# Put your path. Note that this path should be
+# pipeline (poteka-pipeline-pytorch) root, not project root.
+# It should be like a/b/poteka-pipeline-pytorch. 
 
 ...
 

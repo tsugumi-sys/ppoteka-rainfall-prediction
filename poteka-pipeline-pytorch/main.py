@@ -24,21 +24,26 @@ def main(cfg: DictConfig):
     mlflow_run_name = get_mlflow_tag_from_input_parameters(cfg.input_parameters)
     mlflow_experiment_id = os.getenv("MLFLOW_EXPERIMENT_ID", 0)
     # Check root dir settings
-    if not os.path.exists(cfg.pipeline_root_dir_path):
+    if cfg.pipeline_root_dir_path != os.getcwd():
         raise ValueError(
             "Invalid `pipeline_root_dir_path` setting in conf/config.yaml."
-            f" The path {cfg.pipeline_root_dir_path} does not exist."
+            f" The path {cfg.pipeline_root_dir_path} does not exist, or"
+            " not same as the current directory."
         )
 
     # Initialize data directory. This data directory is temporaly directory for saving results.
     # These results are also saved in mlflow direcotory (./mlruns)
     if os.path.exists(os.path.join(cfg.pipeline_root_dir_path, "data")):
         logger.warning("./data directory is automatically deleted.")
-        shutil.rmtree(os.path.join(cfg.pipeline_root_dir_path, "data"), ignore_errors=True)
+        shutil.rmtree(
+            os.path.join(cfg.pipeline_root_dir_path, "data"), ignore_errors=True
+        )
     os.makedirs("./data")
 
     if not ModelName.is_valid(cfg.model_name):
-        raise ValueError(f"Invalid Model Name {cfg.model_name}. This should be in {ModelName.all_names()}")
+        raise ValueError(
+            f"Invalid Model Name {cfg.model_name}. This should be in {ModelName.all_names()}"
+        )
 
     if not WeightsInitializer.is_valid(cfg.weights_initializer):
         raise ValueError(
@@ -51,7 +56,9 @@ def main(cfg: DictConfig):
         with mlflow.start_run():
             # Save whole configuration of this run.
             omegaconf_manager = OmegaconfManager()
-            hydra_file_path = os.path.join(cfg.pipeline_root_dir_path, "data", "hydra.yaml")
+            hydra_file_path = os.path.join(
+                cfg.pipeline_root_dir_path, "data", "hydra.yaml"
+            )
             omegaconf_manager.save(cfg, hydra_file_path, except_keys="secrets")
 
             # Save scaling method in pearent run.
@@ -67,14 +74,22 @@ def main(cfg: DictConfig):
                 env_manager="local",
                 parameters={"hydra_file_path": hydra_file_path},
             )
-            preprocess_run = mlflow.tracking.MlflowClient().get_run(preprocess_run.run_id)
+            preprocess_run = mlflow.tracking.MlflowClient().get_run(
+                preprocess_run.run_id
+            )
 
             # Update hydra conf file
             current_dir = os.getcwd()
             preprocess_artifact_uri = os.path.join(
-                current_dir, "mlruns/", str(mlflow_experiment_id), preprocess_run.info.run_id, "artifacts/"
+                current_dir,
+                "mlruns/",
+                str(mlflow_experiment_id),
+                preprocess_run.info.run_id,
+                "artifacts/",
             )
-            cfg = omegaconf_manager.update(cfg, {"train.upstream_dir_path": preprocess_artifact_uri})
+            cfg = omegaconf_manager.update(
+                cfg, {"train.upstream_dir_path": preprocess_artifact_uri}
+            )
             omegaconf_manager.save(cfg, hydra_file_path, except_keys=["secrets"])
 
             # Run train run in child run.
@@ -110,9 +125,14 @@ def main(cfg: DictConfig):
             evaluate_run = mlflow.tracking.MlflowClient().get_run(evaluate_run.run_id)
 
             mlflow.log_artifact(hydra_file_path)
-        send_notification("[Succesfully ended]: ppoteka-pipeine-pytorch", cfg["secrets"]["notify_api_token"])
+        send_notification(
+            "[Succesfully ended]: ppoteka-pipeine-pytorch",
+            cfg["secrets"]["notify_api_token"],
+        )
     except Exception:
-        send_notification("[Faild]: ppotela-pipeline-pytorch", cfg["secrets"]["notify_api_token"])
+        send_notification(
+            "[Faild]: ppotela-pipeline-pytorch", cfg["secrets"]["notify_api_token"]
+        )
 
 
 def logging_core_hydra_parameters(cfg: DictConfig):
@@ -124,8 +144,12 @@ def logging_core_hydra_parameters(cfg: DictConfig):
     logger.info(f"scaling_method: {cfg.scaling_method}")
     logger.info(f"weights_initializer: {cfg.weights_initializer}")
     logger.info(f"is_obpoint_labeldata: {cfg.is_obpoint_labeldata}")
-    logger.info(f"multi_parameters_model.return_sequences: {cfg.multi_parameters_model.return_sequences}")
-    logger.info(f"single_parameter_model.return_sequences: {cfg.single_parameter_model.return_sequences}")
+    logger.info(
+        f"multi_parameters_model.return_sequences: {cfg.multi_parameters_model.return_sequences}"
+    )
+    logger.info(
+        f"single_parameter_model.return_sequences: {cfg.single_parameter_model.return_sequences}"
+    )
     logger.info(f"use_dummy_data: {cfg.use_dummy_data}")
 
     print("=" * 50)

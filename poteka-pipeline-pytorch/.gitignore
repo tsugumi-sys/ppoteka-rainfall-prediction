@@ -18,5 +18,8 @@ conf/secrets/*
 !preprocess/src/train_dataset.csv
 !preprocess/src/test_dataset.json
 
+!fig/sequential_prediction.png
+!fig/combine_models_prediction.png
+
 tmp/
 *.lock
