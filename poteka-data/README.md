@@ -120,6 +120,8 @@ After this process, new files are placed as follows.
 ├── ...
   ```
 
-#### `EDA/`
+### Other things
 
-Exporatory data analysis for each weather parameters in jupyter notebooks.
+#### Directories
+
+- `EDA/`: Exporatory data analysis for each weather parameters in jupyter notebooks.
