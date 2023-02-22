@@ -14,14 +14,14 @@ See [API documents](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/)
 2. **Training:** Train and validation datasets, prepared in preprocessing process are loaded.
   Then the target model trained with hyperparameters and other parameters
   defined in configuration files (all configuration are managed by `hydra` in `conf/` directory).
-  ![Sequential Prediction](./fig/sequential_prediction.png)
 3. **Evaluation:** The trained model is evaluated using the evaluation dataset. There are 3 types of evaluations.
-- NormalEvaluation: The model's output is the sequences of frames.
-- SequentialEvaluation: The modle's output is a single frame. The model uses 
+- [NormalEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/normal_evaluator.html): The model's output is the sequences of frames.
+- [SequentialEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/sequential_evaluator.html): The modle's output is a single frame. The model uses 
   the past predictions to predict next frames.
-- CombineModelsEvaluation: The multiple parameter models (like `rain/humidity/temperature`) is trained
+  ![Sequential Prediction](./fig/sequential_prediction.png)
+- [CombineModelsEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/combine_models_evaluator.html): The multiple parameter models (like `rain/humidity/temperature`) is trained
   and also single parameter models are trained (`rain`, 'humidity' and `temperature` separately)  in training process.
-  The single parameter models predicts its parameter, the temperature model predicts temperature. Then, these predction
+  The single parameter models predicts its parameter, like the temperature model predicts temperature. Then, these predction
   results are used when the multiple parameter predicts sequentially.
   ![Combine Models Prediction](./fig/combine_models_prediction.png)
 
