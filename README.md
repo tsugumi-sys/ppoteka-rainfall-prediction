@@ -7,10 +7,15 @@ This repository contains two parts for rainfall prediction using PPOTEKA data.
 
 ## Getting started
 
-1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`.
-  The directory tree is as follows.
-  ```
-  .
+1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`. The
+   directory tree is as follows.
+
+```bash
+mkdir data && mkdir data/poteka-raw-data
+```
+
+```
+.
 ├── data/ (<- You Need to Create This Folder.)
 │   └── poteka-raw-data/ (<- You need to Create This Folder and place raw P-POTEKA data.)
 │       ├── Anabu-1B_00181286/
@@ -22,10 +27,20 @@ This repository contains two parts for rainfall prediction using PPOTEKA data.
 ├── poteka-data/
 ├── poteka-pipeline-pytorch/
 └── README.md
-  ```
+```
+
 2. Exacute data cleaning and interpolation in `poteka-data/`.
+
+```bash
+cd poteka-data && make data_cleaning && ... (See poteka-data/README.md)
+```
+
 3. Training and evaluation machine learning models in
    `poteka-pipeline-pytorch/`.
+
+```bash
+cd poteka-pipeline-pytorch && make ... (See poteka-pipeline-pytorch/README.md)
+```
 
 #### NOTE
 

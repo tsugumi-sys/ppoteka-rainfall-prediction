@@ -11,18 +11,25 @@ See [API documents](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/)
 
 1. **Preprocessing:** All P-POTEKA datasets into train, validation and
    evaluation datasets and store its metadata in this process.
-2. **Training:** Train and validation datasets, prepared in preprocessing process are loaded.
-  Then the target model trained with hyperparameters and other parameters
-  defined in configuration files (all configuration are managed by `hydra` in `conf/` directory).
-3. **Evaluation:** The trained model is evaluated using the evaluation dataset. There are 3 types of evaluations.
-- [NormalEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/normal_evaluator.html): The model's output is the sequences of frames.
-- [SequentialEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/sequential_evaluator.html): The modle's output is a single frame. The model uses 
-  the past predictions to predict next frames.
-  ![Sequential Prediction](./fig/sequential_prediction.png)
-- [CombineModelsEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/combine_models_evaluator.html): The multiple parameter models (like `rain/humidity/temperature`) is trained
-  and also single parameter models are trained (`rain`, 'humidity' and `temperature` separately)  in training process.
-  The single parameter models predicts its parameter, like the temperature model predicts temperature. Then, these predction
-  results are used when the multiple parameter predicts sequentially.
+2. **Training:** Train and validation datasets, prepared in preprocessing
+   process are loaded. Then the target model trained with hyperparameters and
+   other parameters defined in configuration files (all configuration are
+   managed by `hydra` in `conf/` directory).
+3. **Evaluation:** The trained model is evaluated using the evaluation dataset.
+   There are 3 types of evaluations.
+
+- [NormalEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/normal_evaluator.html):
+  The model's output is the sequences of frames.
+- [SequentialEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/sequential_evaluator.html):
+  The modle's output is a single frame. The model uses the past predictions to
+  predict next frames. ![Sequential Prediction](./fig/sequential_prediction.png)
+- [CombineModelsEvaluation](https://tsugumi-sys.github.io/ppoteka-rainfall-prediction/pdoc_contents/evaluate/src/combine_models_evaluator.html):
+  The multiple parameter models (like `rain/humidity/temperature`) is trained
+  and also single parameter models are trained (`rain`, 'humidity' and
+  `temperature` separately) in training process. The single parameter models
+  predicts its parameter, like the temperature model predicts temperature. Then,
+  these predction results are used when the multiple parameter predicts
+  sequentially.
   ![Combine Models Prediction](./fig/combine_models_prediction.png)
 
 ### Tools
@@ -54,7 +61,7 @@ All models are difined in `train/src/models`.
 
 ### Setup
 
-Modify `pipeline_root_dir_path` in `conf/config.yaml`
+#### Modify `pipeline_root_dir_path` in `conf/config.yaml`
 
 ```yaml
 // conf/config.yaml
@@ -70,34 +77,38 @@ pipeline_root_dir_path: your/path
 # It should be like a/b/poteka-pipeline-pytorch. 
 
 ...
-
 ```
 
-Create `secrets` directory and put `secret.yaml`.
+#### Create `secrets` directory and put `secret.yaml`.
 
 ```bash
 mkdir conf/secrets && touch conf/secrets/secret.yaml
 ```
-Put secret api token for notification services (If you don't use, put dummy string).
+
+#### Put secret api token for notification services (If you don't use, put dummy string).
+
 Notification services are used for notifying the end of pipeline.
 
 ```yaml
 // conf/secrets/secret.yaml
 
 notify_api_token: xxxx (<- put this line)
-
 ```
 
-Place `train_dataset.csv` and `test_dataset.json` in `preprocess/src`. You can
-create them automatically via the command in `../poteka-data/Makefile`.
-See [README.md](https://github.com/tsugumi-sys/ppoteka-rainfall-prediction/tree/main/poteka-data#selecting-training-and-test-datasets).
+#### Place `train_dataset.csv` and `test_dataset.json` in `preprocess/src`.
+
+You can create them automatically via the command in `../poteka-data/Makefile`.
+See
+[README.md](https://github.com/tsugumi-sys/ppoteka-rainfall-prediction/tree/main/poteka-data#selecting-training-and-test-datasets).
 
 ```bash
 cd ../poteka-data
 make select_train_dataset && make select_test_dataset
 ```
 
-Set `CONDA_ENV_NAME` and `EXPERIMENT_NAME` (mlflow experiment name) and 
+#### Set variables in `./Makefile`
+
+Set `CONDA_ENV_NAME` and `EXPERIMENT_NAME` (mlflow experiment name) and
 `MODEL_NAME` (the target model) in `./Makefile`.
 
 ```Makefile
@@ -112,5 +123,14 @@ MODEL_NAME = SAMSeq2Seq # or Seq2Seq, SASeq2Seq
 ...
 ```
 
-Change parameters in `conf/` and run commands in `Makefile`.
+#### Change parameters in `conf/` and run commands in `Makefile`.
+
+#### Run commands
+
+Test run using small datasets for training.
+
+```bash
+make test-train
+```
+
 See comments in the makefile for more information.
