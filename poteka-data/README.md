@@ -22,7 +22,7 @@ cleaning has 3 processes.
   
 ### Setups
 
-Change paraemters in `poteka-data/Makefile`
+#### 1. Change paraemters in `poteka-data/Makefile`
 
 ```bash
 ###
@@ -34,7 +34,9 @@ TIME_STEP_MINUTES=10  <- Change time resolution of minute.
   
 ```
 
-#### Commands
+#### 2. Data Cleaning
+
+Format timestamps and data imputation for data lacking, e.t.c. are executed.
 
 Run the following command.
 
@@ -54,9 +56,9 @@ After cleaning step, the `data/` folder is as follows.
 ├── ...
   ```
 
-### Interpolation
+#### 3. Interpolation
 
-#### Overview
+##### Overview
 
 ##### First step
 
@@ -73,13 +75,15 @@ Creating grid data from the observation points data. The interpolated grid data
 and visualized map are saved in each weather parameter directories (e.g.
 `data/rain_image/`, `data/temp_image/`).
 
-#### Commands
+#### 3-1. Create `one-day-data`.
 
 Run the following commands as the first step (creating `one-data-data`).
 
 ```bash
 make create_oneday_data
 ```
+
+#### 3-2. Interpolation using `one-day-data`.
 
 Then run the following commands for interpolation.
 
@@ -103,9 +107,9 @@ After interpolation step, the `data/` folder is as follows.
 ├── ...
   ```
 
-### Selecting training and test datasets.
+#### 4. Selecting training and test datasets.
 
-#### Overview
+##### Overview
 
 1. Selecting test datasets. The test case meta file `test_dataset.json` are
    created and saved in `../poteka-pipeline-pytorch/preprocess/src/`. Modify
@@ -115,10 +119,16 @@ After interpolation step, the `data/` folder is as follows.
    selected in test case is dropped so `test_dataset.json` is needed for this
    process.
   
-#### Commands
+#### 4-1. Prepare test-dataset.
 
 ```bash
-make select_train_dataset && make select_test_dataset
+make select_test_dataset
+```
+
+#### 4-2. Prepare train-dataset.
+
+```bash
+make select_train_dataset
 ```
    
 After this process, new files are placed as follows.
@@ -134,7 +144,7 @@ After this process, new files are placed as follows.
 ├── ...
   ```
 
-### Other things
+#### Other things
 
 #### Directories
 
