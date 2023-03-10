@@ -6,11 +6,12 @@ CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activ
 ###
 # Common parameters
 ###
-CONDA_ENV_NAME=p-poteka
-DATA_DIR=../data
+CONDA_ENV_NAME=poteka
 N_CPUS=13
 TIME_STEP_MINUTES=10 
 
+
+DATA_DIR=../data
 ###
 # Data cleaning
 ###

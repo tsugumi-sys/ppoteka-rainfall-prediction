@@ -9,6 +9,7 @@ defaults:
 ###
 # Common parameters
 ###
+train_only: false
 model_name: OBPointSeq2Seq
 scaling_method: min_max_standard
 weights_initializer: he

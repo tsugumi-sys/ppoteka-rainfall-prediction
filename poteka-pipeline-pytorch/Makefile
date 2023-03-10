@@ -18,7 +18,17 @@ MODEL_NAME = SAMSeq2Seq
 .PHONY: train
 train:
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && chmod +x scripts/train.sh && scripts/train.sh -e $(EXPERIMENT_NAME) -m $(MODEL_NAME)
-	
+
+TRAIN_RUN_ID = 8aba28989b544895b89938c5261c564e
+.PHONY: evaluate
+evaluate:
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) &&  python run_only_evaluate.py evaluate.re_run.parent_run_id=$(TRAIN_RUN_ID)
+
+.PHONY: train_and_evaluate
+train_and_evaluate:
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && chmod +x scripts/train_and_evaluate.sh && scripts/train_and_evaluate.sh -e $(EXPERIMENT_NAME) -m $(MODEL_NAME)
+
+
 .PHONY: train_all_models
 train_all_models:
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && chmod +x scripts/train_all_models.sh && scripts/train_all_models.sh -e $(EXPERIMENT_NAME)
@@ -32,7 +42,7 @@ train_different_inputs:
 # scripts for test models.
 # Run all processes with only 100 datasets.
 ###
-.PHONY: test-train
+.PHONY: test-run
 test-train:
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && chmod +x scripts/test_run.sh  && scripts/test_run.sh -e test-run -m $(MODEL_NAME)	
 	

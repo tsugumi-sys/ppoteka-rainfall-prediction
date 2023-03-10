@@ -7,6 +7,7 @@ do
 done
 
 mlflow run --experiment-name $EXPERIMENT_NAME . --env-manager=local \
+  -P train_only=true \
   -P model_name=$MODEL_NAME \
   -P scaling_method=min_max \
   -P weights_initializer=he \

@@ -127,10 +127,55 @@ MODEL_NAME = SAMSeq2Seq # or Seq2Seq, SASeq2Seq
 
 #### Run commands
 
-Test run using small datasets for training.
+1. Test run (training & evaluation) using small datasets for training.
 
 ```bash
-make test-train
+make test-run
+```
+
+2. Training
+
+The trained model and other artifacts and metrics (learning curves, e.t.c) are saved.
+
+```bash
+make train
+  
+```
+
+3. Evaluation
+
+First, you need to modify `TRAIN_RUN_ID` in `poteka-pipeline-pytorch/Makefile`. The `TRAIN_RUN_ID`
+is generated after `make train` or `make train_and_evaluation` and you can check it via `make ui`
+or console logs.
+
+```bash
+# poteka-pipeline-pytorch/Makefile  
+
+...
+TRAIN_RUN_ID=your-train-id
+.PHONY: evaluate
+...
+```
+
+Execute evaluation process using test dataset. Prediction resutls of metrics and
+figures are saved.
+
+```bash
+make evaluate
+```
+
+4. Training & Evaluation
+
+Runing training and evaluation at one step.
+
+```bash
+make train_and_evaluate
+```
+
+5. Check results via mlflow UI.
+
+```bash
+make ui
 ```
 
 See comments in the makefile for more information.

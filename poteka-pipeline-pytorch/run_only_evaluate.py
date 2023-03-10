@@ -19,6 +19,15 @@ def get_artifact_path(run_id: str) -> str:
     return run.info.artifact_uri.replace("file://", "")
 
 
+def get_child_run_id(parent_run_id: str, target_entry_point = 'preprocess'):
+    runs = mlflow.tracking.MlflowClient().search_runs(
+        experiment_ids=[get_experiment_id(parent_run_id)],
+        filter_string=f"tags.`mlflow.parentRunId` = '{parent_run_id}' and tags.`mlflow.project.entryPoint` = '{target_entry_point}'",
+        max_results=1,
+    )
+    return runs[0].info.run_id
+
+
 def get_experiment_id(run_id: str):
     run = mlflow.tracking.MlflowClient().get_run(run_id)
     return run.info.experiment_id
@@ -55,6 +64,9 @@ def main(cfg: DictConfig):
     # Copy paernt runs hydra.yaml to data direcotry
     omegaconf_manager = OmegaconfManager()
     parent_run_cfg = omegaconf_manager.load(os.path.join(get_artifact_path(parent_run_id), "hydra.yaml"))
+    omegaconf_manager.update(parent_run_cfg, {'evaluate.re_run.parent_run_id': parent_run_id})
+    omegaconf_manager.update(parent_run_cfg, {'evaluate.model_file_dir_path': get_artifact_path(get_child_run_id(parent_run_id, 'train'))})
+    omegaconf_manager.update(parent_run_cfg, {'evaluate.preprocess_meta_file_dir_path': get_artifact_path(get_child_run_id(parent_run_id, 'preprocess'))})
     hydra_file_path = os.path.join(cfg.pipeline_root_dir_path, "data", "hydra.yaml")
     omegaconf_manager.save(parent_run_cfg, hydra_file_path)
 

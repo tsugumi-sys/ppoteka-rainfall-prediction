@@ -100,32 +100,6 @@ def main(cfg: DictConfig):
                 env_manager="local",
                 parameters={"hydra_file_path": hydra_file_path},
             )
-            
-            if not cfg.train_only:
-                train_run = mlflow.tracking.MlflowClient().get_run(train_run.run_id)
-
-                # Update hydra conf file
-                model_file_dir_path = train_run.info.artifact_uri
-                model_file_dir_path = model_file_dir_path.replace("file://", "")
-                cfg = omegaconf_manager.update(
-                    cfg,
-                    {
-                        "evaluate.model_file_dir_path": model_file_dir_path,
-                        "evaluate.preprocess_meta_file_dir_path": preprocess_artifact_uri,
-                    },
-                )
-                omegaconf_manager.save(cfg, hydra_file_path, except_keys=["secrets"])
-
-                # Run evaluate run in child run.
-                evaluate_run = mlflow.run(
-                    uri="./evaluate",
-                    entry_point="evaluate",
-                    backend="local",
-                    env_manager="local",
-                    parameters={"hydra_file_path": hydra_file_path},
-                )
-                evaluate_run = mlflow.tracking.MlflowClient().get_run(evaluate_run.run_id)
-
             mlflow.log_artifact(hydra_file_path)
         send_notification(
             "[Succesfully ended]: ppoteka-pipeine-pytorch",
@@ -142,7 +116,6 @@ def logging_core_hydra_parameters(cfg: DictConfig):
     print("config.yaml core parameters.")
     print("=" * 50)
     logger.info(f"input_parameters: {cfg.input_parameters}")
-    logger.info(f"train_only: {cfg.train_only}")
     logger.info(f"model_name: {cfg.model_name}")
     logger.info(f"scaling_method: {cfg.scaling_method}")
     logger.info(f"weights_initializer: {cfg.weights_initializer}")

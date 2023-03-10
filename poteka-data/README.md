@@ -19,6 +19,20 @@ cleaning has 3 processes.
    `data/imputed_data/` directory.
 3. **Accumulation of rainfall data**: Hourly rainfall amount is calculated.
    Finally the data is saved into `data/accumulated-raf-data/` directory.
+  
+### Setups
+
+Change paraemters in `poteka-data/Makefile`
+
+```bash
+###
+# Common parameters
+###
+CONDA_ENV_NAME=poteka <- Change your environment name.
+N_CPUS=13             <- Change cpu counts for multiprocessing based on your PC specs.
+TIME_STEP_MINUTES=10  <- Change time resolution of minute.
+  
+```
 
 #### Commands
 
