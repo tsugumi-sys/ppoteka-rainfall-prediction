@@ -59,9 +59,9 @@ All models are difined in `train/src/models`.
 
 ## Getting Started
 
-### Setup
+### 0. Setup
 
-#### Modify `pipeline_root_dir_path` in `conf/config.yaml`
+#### 0-1. Modify `pipeline_root_dir_path` in `conf/config.yaml`
 
 ```yaml
 // conf/config.yaml
@@ -79,13 +79,13 @@ pipeline_root_dir_path: your/path
 ...
 ```
 
-#### Create `secrets` directory and put `secret.yaml`.
+#### 0-2. Create `secrets` directory and put `secret.yaml`.
 
 ```bash
 mkdir conf/secrets && touch conf/secrets/secret.yaml
 ```
 
-#### Put secret api token for notification services (If you don't use, put dummy string).
+#### 0-3. Put secret api token for notification services (If you don't use, put dummy string).
 
 Notification services are used for notifying the end of pipeline.
 
@@ -95,7 +95,7 @@ Notification services are used for notifying the end of pipeline.
 notify_api_token: xxxx (<- put this line)
 ```
 
-#### Place `train_dataset.csv` and `test_dataset.json` in `preprocess/src`.
+#### 0-4. Place `train_dataset.csv` and `test_dataset.json` in `preprocess/src`.
 
 You can create them automatically via the command in `../poteka-data/Makefile`.
 See
@@ -106,7 +106,7 @@ cd ../poteka-data
 make select_train_dataset && make select_test_dataset
 ```
 
-#### Set variables in `./Makefile`
+#### 0-5. Set variables in `./Makefile`
 
 Set `CONDA_ENV_NAME` and `EXPERIMENT_NAME` (mlflow experiment name) and
 `MODEL_NAME` (the target model) in `./Makefile`.
@@ -123,9 +123,9 @@ MODEL_NAME = SAMSeq2Seq # or Seq2Seq, SASeq2Seq
 ...
 ```
 
-#### Change parameters in `conf/` and run commands in `Makefile`.
+#### 0-6. Change parameters in `conf/` and run commands in `Makefile`.
 
-#### Run commands
+### 2. Run training and evaluation.
 
 1. Test run (training & evaluation) using small datasets for training.
 
