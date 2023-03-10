@@ -7,7 +7,7 @@ This repository contains two parts for rainfall prediction using PPOTEKA data.
 
 ## Getting started
 
-0. Create virtual environment of pyhton.
+### 0. Create virtual environment of pyhton.
 
 #### NOTE
 
@@ -43,7 +43,7 @@ conda install -c conda-forge pandas
 
 However, don't forget to see installation commands for each libralies' in official documentation.
  
-1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`.
+### 1. Place the raw PPOTEKA dataset to `$(PROJECT_ROOT)/data/poteka-raw-data/`.
   The directory tree is as follows.
   ```
   .
@@ -60,13 +60,13 @@ However, don't forget to see installation commands for each libralies' in offici
 └── README.md
 ```
 
-2. Exacute data cleaning and interpolation in `poteka-data/`.
+### 2. Exacute data cleaning and interpolation in `poteka-data/`.
 
 ```bash
 cd poteka-data && make data_cleaning && ... (See poteka-data/README.md)
 ```
 
-3. Training and evaluation machine learning models in
+### 3. Training and evaluation machine learning models in
    `poteka-pipeline-pytorch/`.
 
 ```bash
